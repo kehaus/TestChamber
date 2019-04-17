@@ -126,7 +126,7 @@ class PKR251(U6Reader):
 
 
 # ==============================================================================
-# main
+# record pressure trace
 # ==============================================================================
 
 def record_pressure_trace(time_interval=600):
@@ -155,8 +155,9 @@ def record_pressure_trace(time_interval=600):
 # ==============================================================================
 
 if __name__ == "__main__":
-	d = u6.U6()
-	d.configU6()
-	pkr = PKR251(d)
-	pkr.get_pressure()
+#	d = u6.U6()
+#	d.configU6()
+#	pkr = PKR251(d)
+#	pkr.get_pressure()
+	pass
 
