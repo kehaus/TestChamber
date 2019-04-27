@@ -5,7 +5,7 @@ Test data and analysis for self-made effusion cell performance
 date:   04/18/2019
 """
 __author__ = "kha"
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 
 
 import numpy as np
@@ -39,7 +39,7 @@ ax2_dct = {
 
 fig2 = plt.figure()
 ax2 = fig2.add_subplot(111, **ax2_dct)
-ax2.plot(V,T, c='orange')
+ax2.plot(I,V, c='orange')
 plt.grid()
 
 
