@@ -213,18 +213,23 @@ plt.grid()
 
 
 ax2_dct = {
-  'xlabel':   'Needle valve position [valve scale]',
-  'ylabel':   'Pressure [torr]'
+  'xlabel':     'Needle valve position [valve scale]',
+  'ylabel':     'Pressure [torr]',
+  'ylim':		[1*10**-8, 2*10**-6],
+#  'yscale':		'log',
 }
 
 fig2 = plt.figure(figsize=(8,5))
 ax2 = fig2.add_subplot(111, **ax2_dct)
+ax2.plot(valve_pos_open_22C,p_open_22C, label='open valve 22C')
+ax2.plot(valve_pos_close_22C, p_close_22C, label='close valve 22C')
 ax2.plot(valve_pos_open_50C,p_open_50C, label='open valve, 50C')
 ax2.plot(valve_pos_close_50C, p_close_50C, label='close valve 50C')
 ax2.plot(valve_pos_open_77C,p_open_77C, label='open valve 77C')
 ax2.plot(valve_pos_close_77C, p_close_77C, label='close vale, 77C')
 ax2.legend(loc=0)
 ax2.yaxis.set_major_formatter(mpl.ticker.StrMethodFormatter('{x:.1e}'))
+#ax2.set_yscale('log')
 plt.grid()
 
 plt.show()
