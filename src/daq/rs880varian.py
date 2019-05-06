@@ -13,7 +13,7 @@ import time
 
 
 
-PIN_CONFIG = {
+PIN_CONFIG = {	# extracted from RS880Varian user manual p.3-3
 	'mant_lsd_1':			1,
 	'mant_lsd_2':			2,
 	'mant_lsd_4':			3,
@@ -49,51 +49,92 @@ PIN_CONFIG = {
 	'fil_status_common':	'Z'
 }
 
+DEFAULT_P_UNIT  'torr'
 
-# ==
+# =====================================
 #
-# ==
-
+# =====================================
 class RS880VarianError(Exception):
 	""" """
 	pass
 
 
+# =====================================
+#
+# =====================================
 class RS880Varian(object):
-	""" """
+	"""represents RS880Varian ion gauge controller
+
+
+	functions and logic in here is based on the controller
+	manual 
+
+	"""
 
 	def __init__(self, dd, *args, **kwargs):
 		""" """
 		super().__init__(*args, **kwargs)
 		self.dd = dd
 		self.pin_config = PIN_CONFIG
+		self.p_unit = DEFAULT_P_UNIT
 		pass
 
-	def get_exp(self):
+	def get_pressure(self):
+		"""reads pressure from controller
+
+		Attention:
+		**unit of pressure reading needs to be interpreted manually. This script 
+		is not capable of reading back the pressure unit.**
+
+		"""
+		exp_val = self.get_pressure_exponent()
+		dis_val = self.dd.get_ai_value(
+			self.get_u6_pin_name('record_output_ion')
+		)
+		return dis_val * 10**exp_val
+
+	def get_pressure_unit(self):
+		return self.p_unit
+
+	def get_pressure_exponent(self):
 		""" """
 
-		bit1 = self.dd.get_dio_state(self.get_pin_name('exp_lsd_1'))
-		bit2 = self.dd.get_dio_state(self.get_pin_name('exp_lsd_2'))
-		bit4 = self.dd.get_dio_state(self.get_pin_name('exp_lsd_4'))
-		bit8 = self.dd.get_dio_state(self.get_pin_name('exp_lsd_8'))
-		bit_msd = self.dd.get_dio_state(self.get_pin_name('exp_msd'))
-		bit_sign = self.dd.get_dio_state(self.get_pin_name('exp_sign'))
+		### not tested yet ###
 
-		return [bit_sign, bit_msd, bit8, bit4, bit2, bit1]
+		pin_lst = [
+			'exp_sign', 'exp_sign', 'exp_lsd_1', 
+			'exp_lsd_2', 'exp_lsd_4', 'exp_lsd_8'
+		]
 
-	def calc_exp(self, bit_lst):
-		""" """
+		bit_lst = [
+			self.dd.get_dio_state(
+				self.get_u6_pin_name(x)) for x in pin_lst
+		]
+
+		exp_val = self._calc_exp(bit_lst)
+		return exp_val
+
+	def _calc_exp(self, bit_lst):
+		"""returns an inverted bit string from bits given in bit_lst"""
 
 		# gives the wrong values ... maybe invert individual bits?
+		### need to verify if this works for the whole range of the gauge controller ###
 
-		s = '0b'+''.join(['1' if x else '0' for x in bit_lst[1:]])
+		s = '0b'+''.join(['1' if not x else '0' for x in bit_lst[1:]])
 		return (-1)**bit_lst[0] * int(s, 2)
 
 
-	def get_pin_name(self, rs880_pin_name):
-		"""converts rs880Varian pin convenction to U6 pin convention"""
+	def get_u6_pin_name(self, rs880_pin_name):
+		"""converts rs880Varian pin convenction to U6 pin convention
+
+		''rs880_pin_name'' can be a string or a nested list of strings
+
+		"""
+		if type(rs880_pin_name) is list:
+			return [self.get_u6_pin_name(x) for x in rs880_pin_name]
 		self._check_pin_name(rs880_pin_name)
-		return self.dd.pc[self.pin_config[rs880_pin_name]]
+		u6_pin_name = self.dd.pc[self.pin_config[rs880_pin_name]]
+		return u6_pin_name
 
 	def _check_pin_name(self, pin_name):
 		"""checks if pin name is in self.pin_config"""
@@ -107,7 +148,7 @@ class RS880Varian(object):
 		### not tested yet ###
 
 		self.dd.set_dio_pulse(
-			self.get_pin_name('filament_on_pulse'), 
+			self.get_u6_pin_name('filament_on_pulse'), 
 			rising=False, duration=0.5
 		)
 
@@ -117,12 +158,12 @@ class RS880Varian(object):
 		### not tested yet ###
 
 		self.dd.set_dio_pulse(
-			self.get_pin_name('filament_off_pulse'), 
+			self.get_u6_pin_name('filament_off_pulse'), 
 			rising=False, duration=0.5
 		)
 
 	def get_filament_status(self):
-		"""
+		"""returns filament status. 1=on, 0=off
 
 		The instrument has an internal relay associated with the filament. When
 		the filament is ON, the realy is energized, and the pins Z and X (N.O.) 
@@ -130,23 +171,29 @@ class RS880Varian(object):
 		filament is OFF, the relay is de-energized and pins Z and Y (N.C.) are 
 		connected.
 
-		**function only works properly when 5V is connected to RS880Varian 
-		Z-pin**
+		Electrical connection is implemented that Z-pin is connected to logical 0; 
+		And floating digital inputs are set to logical one by default. Therefore is 
+		the relay position determined by checking if X or Y are at logical zero. 
+
+		Attention:
+		**function only works properly when Z-pin of RS880Varian controller is 
+		connected to digital GND**
 
 
 		"""
-		n_o = self.dd.get_dio_status(self.get_pin_name('fil_status_NO'))
-		n_c = self.dd.get_dio_status(self.get_pin_name('fil_status_NC'))
+
+		### not tested yet ###
+		### test carefully. it is not clear if it works as intendet ###
+
+		n_o = self.dd.get_dio_state(self.get_u6_pin_name('fil_status_NO'))
+		n_c = self.dd.get_dio_state(self.get_u6_pin_name('fil_status_NC'))
 
 		if n_o == n_c:
 			raise RS880VarianError(
 				'Read back from filament status channels X (N.O.) and Y (N.C.) ' +
-				'are inconsistent!'
+				'is inconsistent!'
 			)
-
-
-
-		return n_o
+		return int(not n_o)
 
 # =====================================
 #
