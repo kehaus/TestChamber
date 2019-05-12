@@ -12,7 +12,7 @@ import math
 
 
 
-PIN_CONFIG = {
+PIN_CONFIG = {		# PKR251 manual p.11
 	'identification':	'PKR251_1',
 	'signal_output':	'PKR251_2',
 	'signal_common':	'PKR251_3',
@@ -20,6 +20,7 @@ PIN_CONFIG = {
 	'supply_common':	'PKR251_5',
 	'screen':			'PKR251_6'
 }
+
 DEFAULT_P_UNIT = 'torr'
 
 # ==============================================================================
