@@ -39,7 +39,11 @@ PIN_CONFIG = {	# schematics of external devices connectde to U6 pins
 	9:			'EIO0',
 	'K':		'EIO1',
 	'PKR251_2':	'AI0',
-	'PKR251_3':	'GND'
+	'PKR251_3':	'GND',
+	'SM7022_1':	'GND',
+	'SM7022_2':	'AI2',
+	'SM7022_3':	'AO0',
+	'SM7022_10':'AI3'
 }
 
 # U6 channel name mapping
@@ -134,6 +138,56 @@ class DAQUnitExceptionHandling(object):
 # ==============================================================================
 # DAQUnit class
 # ==============================================================================
+
+class BaseChannel(object):
+	""" """
+
+	def __init__(self, dd, pin_config=None):
+		""" """
+		self.dd = dd
+		if pin_config == None:
+			pin_config = PIN_CONFIG
+		self.pin_config = pin_config
+		return 
+
+	def get_u6_pin_name(self, dev_pin_name):
+		""" """
+		if type(dev_pin_name) is list:
+			return [self.get_u6_pin_name(x) for x in dev_pin_name]
+		self._check_pin_name(dev_pin_name)
+		u6_pin_name = self.dd.pc[self.pin_config[dev_pin_name]]
+		return u6_pin_name		
+
+	def _check_pin_name(self, pin_name):
+		"""checks if pin name is in self.pin_config"""
+		if pin_name not in self.pin_config.keys():
+			raise DAQUnitError('pin_name not known. Not part of pin_config')
+		return
+
+
+class AI_channel(BaseChannel):
+	""" """
+
+	def get_ai_value(self, dev_pin_name):
+		""" """
+		val = self.dd.get_ai_value(
+			self.get_u6_pin_name(dev_pin_name))
+		return val
+
+class AO_channel(BaseChannel):
+	""" """
+
+	def set_ao(self, dev_pin_name, value):
+		u6_pin_name = self.get_u6_pin_name(dev_pin_name)
+		self.dd.set_ao(u6_pin_name, value)
+	
+
+class DIO_channel(BaseChannel):
+	""" """
+	pass
+
+
+
 class AINReader(object):
 	""" """
 
@@ -151,10 +205,11 @@ class AINReader(object):
 		pass
 
 
-
-
 class DAQUnitBase(DAQUnitExceptionHandling):
 	""" """
+
+	DAC_BIT_MAX		= 2**16-1
+	DAC_VOLT_MAX	= 10
 
 	def __init__(self, pin_config=None, pin_settings={}, **kwargs):
 		""" """
@@ -292,6 +347,18 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		)
 		return volt
 
+	def set_ao(self, channel, volt, **kwargs):
+		""" """
+		channel = self._check_ao_channel_input(channel)
+
+		bit = self.d.voltageToDACBits(volt, dacNumber=0, is16Bits = True)
+		if channel == AO_DCT['AO0']:
+			cmd = u6.DAC0_16(bit)
+		elif channel == AO_DCT['AO1']:
+			cmd = u6.DAC1_16(bit)
+		else:
+			raise DAQUnitError('channel is not a valid input. Needs to be 0 or 1.')
+		self.d.getFeedback(cmd)
 
 
 ## handle input
@@ -309,6 +376,14 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 			channel = AI_DCT[channel]
 		if channel not in AI_DCT.values():
 			raise DAQUnitError('channel is not a known U6 channel name.')
+		return channel
+
+	def _check_ao_channel_input(self, channel):
+		"""checks if given channel is a valid U6 DAC channel name"""
+		if channel in AO_DCT.keys():
+			channel = AO_DCT[channel]
+		if channel not in AO_DCT.values():
+			raise DAQUnitError('channel is not known U6 channel name')
 		return channel
 
 
