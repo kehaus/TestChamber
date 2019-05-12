@@ -13,7 +13,7 @@ import time
 
 
 
-PIN_CONFIG = {	# extracted from RS880Varian user manual p.3-3
+PIN_CONFIG = {	# RS880Varian user manual p.3-3
 	'mant_lsd_1':			1,
 	'mant_lsd_2':			2,
 	'mant_lsd_4':			3,
@@ -49,7 +49,7 @@ PIN_CONFIG = {	# extracted from RS880Varian user manual p.3-3
 	'fil_status_common':	'Z'
 }
 
-DEFAULT_P_UNIT  'torr'
+DEFAULT_P_UNIT = 'torr'
 
 # =====================================
 #
