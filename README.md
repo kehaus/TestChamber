@@ -8,6 +8,13 @@ This repository contains the python software which controls the different compen
 * Labjack USB driver
 * LabjackPython package
 
+## Required packages
+* LabjackPython package
+* numpy
+* SciPy
+* thermocouples_reference
+* MatPlotLib
+
 Instructions on how to install exodriver and LabjackPython are given in the section *How to install Labjack USB driver and Python package* below.
 
 
