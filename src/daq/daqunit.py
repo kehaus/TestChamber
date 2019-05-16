@@ -19,6 +19,7 @@ __author__ = "kha"
 
 import u6
 import time
+from thermocouples_reference import thermocouples
 
 
 
@@ -43,7 +44,9 @@ PIN_CONFIG = {	# schematics of external devices connectde to U6 pins
 	'SM7022_1':	'GND',
 	'SM7022_2':	'AI2',
 	'SM7022_3':	'AO0',
-	'SM7022_10':'AI3'
+	'SM7022_10':'AI3',
+	'HSTC_CH':	'AI12',
+	'HSTC_AL':	'AI13'
 }
 
 # U6 channel name mapping
@@ -359,6 +362,27 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		else:
 			raise DAQUnitError('channel is not a valid input. Needs to be 0 or 1.')
 		self.d.getFeedback(cmd)
+
+	def get_temperature(self):
+		"""returns the ambient temperature sensor value in Kelvin
+
+		With enclosure on, the U6 is typically 3°C higher than ambient. The calibration
+		constant have taken this into account and have therefore an offset of -3°C, so 
+		the returned calibration readings are nominally the same as ambient with the 
+		enclosure installed
+
+		for reference check: 
+			https://labjack.com/support/datasheets/u6/hardware-description/ain/internal-temp-sensor
+
+
+		"""
+		return self.d.getTemperature()
+
+	def get_internal_temperature(self):
+		"""returns the U6's internal temperature sensor value in Kelvin
+
+		"""
+		return self.get_temperature + 3
 
 
 ## handle input
