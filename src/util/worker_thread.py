@@ -60,7 +60,6 @@ class WorkerThread(threading.Thread):
 
 		self._stop = False
 		while not self._stop:
-			print('start cycle')
 			if not self.q.empty():	
 				self.process_task()
 			time.sleep(self.sleep_time)
@@ -95,8 +94,9 @@ class WorkerTask(DataSet):
 				 kwargs=None, 
 				 continuous=False, 
 				 save=False, 
-				 plot=False):
-		super().__init__()
+				 plot=False,
+                                 base_name=None):
+		super().__init__(base_name=base_name)
 		WorkerTask.COUNT += 1
 		self.continuous = continuous
 		self.save = save
@@ -158,7 +158,6 @@ class WorkerTask(DataSet):
 		pass
 
 	def do_task(self):
-		print('do task')
 
 		self.rtn = self.func(*self.args, **self.kwargs)
 
