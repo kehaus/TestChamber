@@ -143,7 +143,7 @@ class DAQUnitExceptionHandling(object):
 # ==============================================================================
 
 class BaseChannel(object):
-	""" """
+	"""Base class for a Labjack U6 Analog input or output channel"""
 
 	def __init__(self, dd, pin_config=None):
 		""" """
@@ -169,7 +169,13 @@ class BaseChannel(object):
 
 
 class AI_channel(BaseChannel):
-	""" """
+	"""represents a LabJack U6 analog input channel
+
+	This class allows do directly read out AIN channels from the U6. It 
+	furthermore takes care of mapping the device pin_name to the 
+	corresponding U6 pin_name representation
+
+	 """
 
 	def get_ai_value(self, dev_pin_name):
 		""" """
