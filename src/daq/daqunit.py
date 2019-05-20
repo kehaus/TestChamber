@@ -12,6 +12,15 @@ on hardware connected. need to mock
 * write() in U6
 * read() in U6
 
+
+Examples
+for debugging U6 communication:
+
+	>>> d = u6.U6()
+	>>> d.configU6()
+	>>> channel_nr = 4
+	>>> d.getAIN(channl_nr)
+
 """
 __version__ = "0.0.1"
 __author__ = "kha"
@@ -175,7 +184,7 @@ class AI_channel(BaseChannel):
 	furthermore takes care of mapping the device pin_name to the 
 	corresponding U6 pin_name representation
 
-	 """
+	"""
 
 	def get_ai_value(self, dev_pin_name):
 		""" """
@@ -184,7 +193,13 @@ class AI_channel(BaseChannel):
 		return val
 
 class AO_channel(BaseChannel):
-	""" """
+	"""represents a LabJack U6 analog output channel
+
+	This class allows do directly read out AIN channels from the U6. It 
+	furthermore takes care of mapping the device pin_name to the 
+	corresponding U6 pin_name representation
+
+	"""
 
 	def set_ao(self, dev_pin_name, value):
 		u6_pin_name = self.get_u6_pin_name(dev_pin_name)
@@ -209,7 +224,7 @@ class AINReader(object):
 
 	def __init__(self, **kwargs):
 		""" """
-		self.settings = AINReader.AIN24AR_DEFAULT_SETTINGS
+		self.settings = AINReader.AIN24AR_DEFAULT_SETTINGS.copy()
 		self.settings.update(kwargs)
 		pass
 
@@ -338,7 +353,7 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		cmd = u6.BitDirWrite(channel, state)
 		self.d.getFeedback(cmd)
 
-	def get_ai_value(self, channel, **kwargs):
+	def get_ai_value(self, channel, verbose=False, **kwargs):
 		""" """
 		channel = self._check_ai_channel_input(channel)
 
@@ -349,6 +364,8 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		# measure voltage
 		ai_obj.settings.update(kwargs)
 		cmd = u6.AIN24AR(channel, **ai_obj.settings)
+		if verbose: 
+			print('cmd: ', cmd)
 		reading = self.d.getFeedback(cmd)
 		volt = self.d.binaryToCalibratedAnalogVoltage(
 			ai_obj.settings['GainIndex'], 
