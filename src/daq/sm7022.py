@@ -61,8 +61,10 @@ class SM7022(AI_channel, AO_channel):
 		volt = self.get_ai_value('I_monitor')
 		return SM7022.convert_to_current_output(volt)
 
-	def set_current(self, current):
+	def set_current(self, current, verbose=False):
 		""" """
+		if verbose:
+			print('SM7022 set current to {:.2f}'.format(current))
 		volt = SM7022.convert_to_readout_voltage(current)
 		self.set_ao('I_program', volt)
 
@@ -78,8 +80,14 @@ class SM7022(AI_channel, AO_channel):
 		return volt_readout / SM7022.V_READOUT_MAX * SM7022.I_OUTPUT_MAX
 
 	@staticmethod
-	def convert_to_readout_voltage(current):
-		return current / SM7022.I_OUTPUT_MAX * SM7022.V_READOUT_MAX
+	def convert_to_readout_voltage(current, correction_factor=0.1):
+		""" 
+		correction factor is necessary because current value entered here does not 
+		atual output current on DC power supply.
+
+		
+		"""
+		return current / SM7022.I_OUTPUT_MAX * SM7022.V_READOUT_MAX * (1+correction_factor)
 
 
 
@@ -93,7 +101,7 @@ class HeaterStage(SM7022):
 
 	def __init__(self, *args, **kwargs):
 		super().__init__(*args, **kwargs)
-		self.tc = TC(pin_config=HeaterStage.PIN_CONFIG_HS)
+		self.tc = TC(self.dd, pin_config=HeaterStage.PIN_CONFIG_HS)
 
 	def get_temperature(self, *args, **kwargs):
 		return self.tc.get_temperature(*args, **kwargs)
