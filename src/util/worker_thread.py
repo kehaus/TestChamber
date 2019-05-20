@@ -47,7 +47,7 @@ class WorkerThread(threading.Thread):
 
 	 """
 
-	SLEEP_TIME = 4
+	SLEEP_TIME = 1
 
 	def __init__(self, q):
 		super(WorkerThread, self).__init__()
@@ -95,7 +95,7 @@ class WorkerTask(DataSet):
 				 continuous=False, 
 				 save=False, 
 				 plot=False,
-                                 base_name=None):
+                 base_name=None):
 		super().__init__(base_name=base_name)
 		WorkerTask.COUNT += 1
 		self.continuous = continuous

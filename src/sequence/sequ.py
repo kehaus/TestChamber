@@ -42,9 +42,36 @@ w = WorkerThread(q)
 
 
 
-#class PKR251Task(WorkerTask):
-#    """ """
+class SM7022Task(WorkerTask):
+	""" """
 
+	DEFAULT_PRM = {
+		'time_stamp':	'',
+		'fn':			'',
+		'axes':		['time', 'I [A]', 'V [V]'],
+	}
+
+	def __init__(self, sm7022, *args, **kwargs):
+		super().__init__(self.dummy_func, *args, **kwargs)
+		self.sm7022 = sm7022 
+
+	def dummy_func(self):
+		""" """
+		return
+
+	def do_task(self):
+
+#		self.rtn = self.func(*self.args, **self.kwargs)
+#	
+		volt = self.sm7022.get_voltage()
+		curr = self.sm7022.get_current()
+
+		if self.save != None:
+			self.save_data_point(volt, curr)
+
+		if self.plot != None:
+			self.plot_data()
+		return
     
 
 

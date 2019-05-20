@@ -9,6 +9,9 @@ __version__ = "1.0.0"
 __author__		= "kha"
 
 
+import os
+
+
 
 #======================================
 # TimeFormatter
@@ -251,9 +254,9 @@ class DataSet(CSVHandler, JSONHandler, TimeFormatter):
 		self.prm.update({'time_stamp': self.time_stamp})
 		self.prm.update({'base_name': self.base_name})
 
-		# create storage files
-		self._generate_json()
-		self._generate_csv()
+#		# create storage files
+#		self._generate_json()
+#		self._generate_csv()
 
 
 	def _generate_fn(self, base_name=None):
@@ -261,10 +264,10 @@ class DataSet(CSVHandler, JSONHandler, TimeFormatter):
 		return '_'.join([self.time_stamp, self.base_name])
 
 	def get_json_fn(self):
-		return '.'.join([self.fn, '.json'])
+		return '.'.join([self.fn, 'json'])
 
 	def get_csv_fn(self):
-		return '.'.join([self.fn, '.csv'])
+		return '.'.join([self.fn, 'csv'])
 
 	def _generate_json(self):
 		fn = self.get_json_fn()
@@ -276,7 +279,12 @@ class DataSet(CSVHandler, JSONHandler, TimeFormatter):
 
 	def save_data_point(self, *vals):
 		""" """
+
 		fn = self.get_csv_fn()
+		if not os.path.isfile(fn):
+			self._generate_json()
+			self._generate_csv()
+		
 		dt = self.get_time_difference(self.time_stamp)
 		self.save_row(fn, [dt] + list(vals))
 		return
