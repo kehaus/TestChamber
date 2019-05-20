@@ -47,7 +47,7 @@ class WorkerThread(threading.Thread):
 
 	 """
 
-	SLEEP_TIME = 1
+	SLEEP_TIME = 0.1
 
 	def __init__(self, q):
 		super(WorkerThread, self).__init__()
@@ -99,7 +99,7 @@ class WorkerTask(DataSet):
 		super().__init__(base_name=base_name)
 		WorkerTask.COUNT += 1
 		self.continuous = continuous
-		self.save = save
+		self.save = bool(save)
 		self.fn_base = 'workertask{:d}'.format(WorkerTask.COUNT)
 		self.plot = plot
 
@@ -127,33 +127,6 @@ class WorkerTask(DataSet):
 		return kwargs
 
 
-#	def _generate_fn(self):
-#		""" """
-#		time_stamp = self.get_time_stamp()
-#		fn = '_'.join([time_stamp,self.fn_base])
-#		return fn
-
-
-#	def _create_data_file(self):
-#
-#		hd = WorkerTask.DEFAULT_FILE_HEADER.copy()
-#
-#		self.fn = self._generate_fn()
-#		self._save_data_point(hd)
-#		return
-
-
-#	def _save_data_point(self, lst):
-#
-#		if not hasattr(self, fn):
-#			self._create_data_file()
-#		self.save_row(self.fn,)
-#		return
-
-#	def _save_parameter(self):
-#		pass
-
-
 	def plot_data(self):
 		pass
 
@@ -161,10 +134,10 @@ class WorkerTask(DataSet):
 
 		self.rtn = self.func(*self.args, **self.kwargs)
 
-		if self.save != None:
+		if self.save != False:
 			self.save_data_point(self.rtn)
 
-		if self.plot != None:
+		if self.plot != False:
 			self.plot_data()
 		return
 
