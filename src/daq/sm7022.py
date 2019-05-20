@@ -15,6 +15,7 @@ __author__ = "kha"
 
 
 from .daqunit import AI_channel ,AO_channel
+from .tc import TC
 
 
 PIN_CONFIG = {
@@ -81,6 +82,21 @@ class SM7022(AI_channel, AO_channel):
 		return current / SM7022.I_OUTPUT_MAX * SM7022.V_READOUT_MAX
 
 
+
+class HeaterStage(SM7022):
+	""" """
+
+	PIN_CONFIG_HS = {
+		'chromel':	'HSTC_CH',
+		'alumel':	'HSTC_AL'
+	}
+
+	def __init__(self, *args, **kwargs):
+		super().__init__(*args, **kwargs)
+		self.tc = TC(pin_config=HeaterStage.PIN_CONFIG_HS)
+
+	def get_temperature(self, *args, **kwargs):
+		return self.tc.get_temperature(*args, **kwargs)
 
 
 
