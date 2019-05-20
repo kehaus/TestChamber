@@ -58,7 +58,7 @@ class HeaterStageReadTask(WorkerTask):
 #	
 		volt = self.hs.get_voltage()
 		curr = self.hs.get_current()
-		temp = 0 #self.hs.get_temperature()
+		temp = self.hs.get_temperature()
 
 		if self.save != False:
 			self.save_data_point(curr, volt, temp)
@@ -210,8 +210,6 @@ class HeaterStageWriteTask(WorkerTask):
 
 	def do_task(self):
 
-#		self.rtn = self.func(*self.args, **self.kwargs)
-#	
 		self.ramp_current()
 
 		if self.save != False:
