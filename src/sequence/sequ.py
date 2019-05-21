@@ -13,9 +13,10 @@ import numpy as np
 import queue
 
 from ..daq.daqunit import DAQUnitBase
-from ..daq.sm7022 import SM7022, HeaterStage
+from ..daq.sm7022 import ES03010, SM7022, HeaterStage, EffusionCell
 from ..daq.pkr251 import PKR251
 from ..daq.rs880varian import RS880Varian
+from ..daq.tc import TC
 
 from ..util.worker_thread import WorkerThread, WorkerTask
 
@@ -58,7 +59,7 @@ class HeaterStageReadTask(WorkerTask):
 #	
 		volt = self.hs.get_voltage()
 		curr = self.hs.get_current()
-		temp = self.hs.get_temperature()
+		temp = -1  # self.hs.get_temperature()
 
 		if self.save != False:
 			self.save_data_point(curr, volt, temp)
@@ -228,27 +229,33 @@ class HeaterStageWriteTask(WorkerTask):
 
 dd = DAQUnitBase()
 sm = SM7022(dd)
+es = ES03010(dd)
 pkr = PKR251(dd)
 rs = RS880Varian(dd)
-hs =HeaterStage(dd)
+#hs =HeaterStage(dd)
+ef = EffusionCell(dd)
 ###
 
 pkr_wt = WorkerTask(pkr.get_pressure, continuous=True, save=True, base_name='pkr251')
 rs_wt = WorkerTask(rs.get_pressure, continuous=True, save=True, base_name='rs880')
-hs_read_wt = HeaterStageReadTask(hs, continuous=True, save=True, base_name='hs')
-hs_write_wt = HeaterStageWriteTask(hs, ramp_curve, continuous=True, save=False)
+#hs_read_wt = HeaterStageReadTask(hs, continuous=True, save=True, base_name='hs')
+#hs_write_wt = HeaterStageWriteTask(hs, ramp_curve, continuous=True, save=False)
+
+ef_writer_wt = HeaterStageWriteTask(ef, ramp_curve, continuous=True, save=False)
 
 q = queue.Queue()
 
 q.put(pkr_wt)
 q.put(rs_wt)
-q.put(hs_read_wt)
+#q.put(hs_read_wt)
 
 w = WorkerThread(q)
 
 
 
-
-
+tc1 = TC(dd, pin_config={'chromel': 'TC1_CH', 'alumel': 'TC1_AL'})
+tc2 = TC(dd, pin_config={'chromel': 'TC2_CH', 'alumel': 'TC2_AL'})
+tc3 = TC(dd, pin_config={'chromel': 'TC3_CH', 'alumel': 'TC3_AL'})
+tc4 = TC(dd, pin_config={'chromel': 'TC4_CH', 'alumel': 'TC4_AL'})
 
 
