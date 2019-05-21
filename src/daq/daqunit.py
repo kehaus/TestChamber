@@ -58,8 +58,20 @@ PIN_CONFIG = {	# schematics of external devices connectde to U6 pins
 	'ES030_2':	'AI0',
 	'ES030_3':	'AO0',
 	'ES030_10':	'AI1',
-	'HSTC_CH':	'AI12',
-	'HSTC_AL':	'AI13'
+	'EFTC_CH':	'AI12',
+	'EFTC_AL':	'AI13',
+	'TC1_CH':	'AI48',
+	'TC1_AL':	'AI56',
+	'TC2_CH':	'AI49',
+	'TC2_AL':	'AI57',
+	'TC3_CH':	'AI50',
+	'TC3_AL':	'AI58',
+	'TC4_CH':	'AI51',
+	'TC4_AL':	'AI59',
+	'TC5_CH':	'AI52',
+	'TC5_AL':	'AI60',
+	'TC6_CH':	'AI53',
+	'TC6_AL':	'AI61'
 }
 
 # U6 channel name mapping
@@ -104,6 +116,96 @@ AI_DCT = {
 	'AI11':		11,
 	'AI12':		12,
 	'AI13':		13,
+# Block 1 - P
+	'AI48':		48,
+	'AI49':		49,
+	'AI50':		50,
+	'AI51':		51,
+	'AI52':		52,
+	'AI53':		53,
+	'AI54':		54,
+	'AI55':		55,
+# Block 1 - N
+	'AI56':		56,
+	'AI57':		57,
+	'AI58':		58,
+	'AI59':		59,
+	'AI60':		60,
+	'AI61':		61,
+	'AI62':		62,
+	'AI63':		63,
+# Block 2 - P
+	'AI64':		64,
+	'AI65':		65,
+	'AI66':		66,
+	'AI67':		67,
+	'AI68':		68,
+	'AI69':		69,
+	'AI70':		70,
+	'AI71':		71,
+# Block 2 - N
+	'AI72':		72,
+	'AI73':		73,
+	'AI74':		74,
+	'AI75':		75,
+	'AI76':		76,
+	'AI77':		77,
+	'AI78':		78,
+	'AI79':		79,
+# Block 3 - P
+	'AI80':		80,
+	'AI81':		81,
+	'AI82':		82,
+	'AI83':		83,
+	'AI84':		84,
+	'AI85':		85,
+	'AI86':		86,
+	'AI87':		87,
+# Block 3 - N
+	'AI88':		88,
+	'AI89':		89,
+	'AI90':		90,
+	'AI91':		91,
+	'AI92':		92,
+	'AI93':		93,
+	'AI94':		94,
+	'AI95':		95,
+# Block 4 - P
+	'AI96':		96,
+	'AI97':		97,
+	'AI98':		98,
+	'AI99':		99,
+	'AI100':	100,
+	'AI101':	101,
+	'AI102':	102,
+	'AI103':	103,
+# Block 4 - N
+	'AI104':	104,
+	'AI105':	105,
+	'AI106':	106,
+	'AI107':	107,
+	'AI108':	108,
+	'AI109':	109,
+	'AI110':	110,
+	'AI111':	111,
+# Block 5 - P
+	'AI112':	112,
+	'AI113':	113,
+	'AI114':	114,
+	'AI115':	115,
+	'AI116':	116,
+	'AI117':	117,
+	'AI118':	118,
+	'AI119':	119,
+# Block 5 - N
+	'AI120':	120,
+	'AI121':	121,
+	'AI122':	122,
+	'AI123':	123,
+	'AI124':	124,
+	'AI125':	125,
+	'AI126':	126,
+	'AI127':	127
 }
 
 AO_DCT = {
@@ -418,7 +520,7 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		if channel in DIO_DCT.keys():
 			channel = DIO_DCT[channel]
 		if channel not in DIO_DCT.values():
-			raise DAQUnitError('channel is not a known U6 channel name.')
+			raise DAQUnitError('{} is not a known U6 channel name.'.format(channel))
 		return channel
 
 	def _check_ai_channel_input(self, channel):
@@ -426,7 +528,7 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		if channel in AI_DCT.keys():
 			channel = AI_DCT[channel]
 		if channel not in AI_DCT.values():
-			raise DAQUnitError('channel is not a known U6 channel name.')
+			raise DAQUnitError('{} is not a known U6 channel name.'.format(channel))
 		return channel
 
 	def _check_ao_channel_input(self, channel):
@@ -434,7 +536,7 @@ class DAQUnitBase(DAQUnitExceptionHandling):
 		if channel in AO_DCT.keys():
 			channel = AO_DCT[channel]
 		if channel not in AO_DCT.values():
-			raise DAQUnitError('channel is not known U6 channel name')
+			raise DAQUnitError('{} is not known U6 channel name.'.formant(channel))
 		return channel
 
 
