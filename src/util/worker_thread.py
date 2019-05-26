@@ -74,10 +74,42 @@ class WorkerThread(threading.Thread):
 
 
 
+class WorkerTaskBase(object):
+	""" """
+	def __init__(self, obj, attr):
+		""" """
+		self.continuous = False
+		self.args = []
+		self.kwargs = {}
+		self.obj = obj
+		self.obj_attr = attr
+#		print('callable: ', callable(getattr(obj, attr)))
+#		print('_check:', self._check_func(getattr(obj, attr)))
+		self.obj_attr = self._check_func(getattr(obj, attr))
+
+
+		
+
+
+
+	def _check_func(self, func):
+		if callable(func) != True:
+			raise WorkerTaskException('func needs to be a callable object')
+		return func
+
+	def load_args_kwargs(self, *args, **kwargs):
+		self.args = args
+		self.kwargs = kwargs
+
+	def do_task(self):
+		rtn = self.obj_attr(*self.args, **self.kwargs)
+		return rtn
+
+
+
 class WorkerTaskException(Exception):
 	""" """
 	pass
-
 
 class WorkerTask(DataSet):
 	""" """
