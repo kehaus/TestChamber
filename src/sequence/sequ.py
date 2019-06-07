@@ -17,6 +17,7 @@ from ..daq.sm7022 import ES03010, SM7022, HeaterStage, EffusionCell
 from ..daq.pkr251 import PKR251
 from ..daq.rs880varian import RS880Varian
 from ..daq.tc import TC
+from ..daq.iga6 import IGA6
 
 from ..util.worker_thread import WorkerThread, WorkerTask
 
@@ -69,11 +70,7 @@ class HeaterStageReadTask(WorkerTask):
 		return
     
 
-ramp_curve = [
-	(0.0, 1.0, 30),
-	(1.0, 1.0, 20),
-	(1.0, 0.0, 30)
-]
+
 
 
 class HeaterStageWriteTask(WorkerTask):
@@ -188,14 +185,14 @@ class HeaterStageWriteTask(WorkerTask):
 		return
 
 
-	def ramp_current(self):
+	def ramp_current(self, verbose=False):
 
 		if self.reached_t_stop():
 			if len(self.ramp_curve) > 0:
 				self._set_start_stop_values(self.ramp_curve.pop(0))
 			else:
 				self.continuous = False
-				self.hs.set_current(self.I_stop, verbose=True)
+				self.hs.set_current(self.I_stop, verbose=verbose)
 				return
 		I_set = self._get_next_current_value()
 		if self.ramp_mode == 'ramp_up':
@@ -225,37 +222,48 @@ class HeaterStageWriteTask(WorkerTask):
 # ==============
 #
 # ==============
-
+ramp_curve = [
+	(0.0, 1.0, 30),
+	(1.0, 1.0, 20),
+	(1.0, 0.0, 30)
+]
 
 dd = DAQUnitBase()
 sm = SM7022(dd)
 es = ES03010(dd)
 pkr = PKR251(dd)
 rs = RS880Varian(dd)
-#hs =HeaterStage(dd)
+hs =HeaterStage(dd)
 ef = EffusionCell(dd)
 ###
 
 pkr_wt = WorkerTask(pkr.get_pressure, continuous=True, save=True, base_name='pkr251')
 rs_wt = WorkerTask(rs.get_pressure, continuous=True, save=True, base_name='rs880')
-#hs_read_wt = HeaterStageReadTask(hs, continuous=True, save=True, base_name='hs')
-#hs_write_wt = HeaterStageWriteTask(hs, ramp_curve, continuous=True, save=False)
+hs_read_wt = HeaterStageReadTask(hs, continuous=True, save=True, base_name='hs')
+hs_write_wt = HeaterStageWriteTask(hs, ramp_curve, continuous=True, save=False)
 
-ef_writer_wt = HeaterStageWriteTask(ef, ramp_curve, continuous=True, save=False)
+ef_read_wt = HeaterStageReadTask(ef, continuous=True, save=True, base_name='ef')
+ef_write_wt = HeaterStageWriteTask(ef, ramp_curve, continuous=True, save=False)
 
 q = queue.Queue()
 
 q.put(pkr_wt)
 q.put(rs_wt)
-#q.put(hs_read_wt)
+q.put(hs_read_wt)
+q.put(ef_read_wt)
+
+com = '//dev//ttyUSB0'
+iga = IGA6(com)
+
+iga_read_wt = WorkerTask(iga.get_temperature, continuous=True, save=True, base_name='iga6')
 
 w = WorkerThread(q)
 
 
 
-tc1 = TC(dd, pin_config={'chromel': 'TC1_CH', 'alumel': 'TC1_AL'})
-tc2 = TC(dd, pin_config={'chromel': 'TC2_CH', 'alumel': 'TC2_AL'})
-tc3 = TC(dd, pin_config={'chromel': 'TC3_CH', 'alumel': 'TC3_AL'})
-tc4 = TC(dd, pin_config={'chromel': 'TC4_CH', 'alumel': 'TC4_AL'})
+#tc1 = TC(dd, pin_config={'chromel': 'TC1_CH', 'alumel': 'TC1_AL'})
+#tc2 = TC(dd, pin_config={'chromel': 'TC2_CH', 'alumel': 'TC2_AL'})
+#tc3 = TC(dd, pin_config={'chromel': 'TC3_CH', 'alumel': 'TC3_AL'})
+#tc4 = TC(dd, pin_config={'chromel': 'TC4_CH', 'alumel': 'TC4_AL'})
 
 

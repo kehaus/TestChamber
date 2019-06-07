@@ -72,9 +72,11 @@ class DEPowerSupply(AI_channel, AO_channel):
 		correction factor is necessary because current value entered here does not 
 		atual output current on DC power supply.
 
+		correction_Factor variable does not have any effect, delete it!!!
+
 
 		"""
-		return current / cls.I_OUTPUT_MAX * cls.V_READOUT_MAX * (1+correction_factor)
+		return current / cls.I_OUTPUT_MAX * cls.V_READOUT_MAX
 
 
 
