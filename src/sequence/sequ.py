@@ -256,9 +256,14 @@ com = '//dev//ttyUSB0'
 iga = IGA6(com)
 
 iga_read_wt = WorkerTask(iga.get_temperature, continuous=True, save=True, base_name='iga6')
+q.put(iga_read_wt)
 
 w = WorkerThread(q)
 
+
+#iga_write = WorkerTask(iga._query, args=['ms'])
+#q.put(iga_write)
+#iga_write.rtn
 
 
 #tc1 = TC(dd, pin_config={'chromel': 'TC1_CH', 'alumel': 'TC1_AL'})
