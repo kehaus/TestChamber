@@ -18,7 +18,7 @@ from .daqunit import AI_channel ,AO_channel
 from .tc import TC
 
 
-
+from .genesys_base import GenesysBase 
 
 
 
@@ -146,7 +146,6 @@ class SM7022(DEPowerSupply):
 	# 	super().__init__(*args, **kwargs)
 	# 	if 'pin_config' not in kwargs.keys():
 	# 		self.pin_config = self.PIN_CONFIG.copy()
-
 
 
 class HeaterStage(SM7022):
