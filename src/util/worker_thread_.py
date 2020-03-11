@@ -68,12 +68,13 @@ class WorkerThread(threading.Thread):
 
 	def stop(self):
 		self._stop = True
-
-	def put(self, w):
-		if not isinstance(w, WorkerTask):
-			raise WorkerThreadException('argument needs to be WorkerTask object')
+    
+    
+    def put(self, w):
+        if not isinstance(w, WorkerTask):
+            raise WorkerThreadException('argument needs to be WorkerTask object')
 		else:
-			self.q.put(w)
+            self.q.put(w)
 
 
 	def process_task(self):
