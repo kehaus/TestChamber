@@ -5,7 +5,7 @@ Created on Sun Mar  8 23:42:27 2020
 
 
 TODO:
-    * signal back to WorkerDevice from WorkerThread when thread is terminated
+    * signal back to DeviceWrapper from WorkerThread when thread is terminated
 
 """
 
@@ -21,24 +21,25 @@ from worker_thread import WorkerThread, WorkerTask
 
 
 # ===========================================================================
-# Dummy Classes
+# Exception class
 # ===========================================================================        
-# class WorkerThread():
-#     pass
-
-# class WorkerTask():
-#     pass
-
-
-# ===========================================================================
-# WorkerDevice class
-# ===========================================================================        
-class WorkerDeviceException(Exception):
+class DeviceWrapperException(Exception):
     pass
 
 
-class WorkerDevice():
-    """ """
+# ===========================================================================
+# DeviceWrapper class
+# ===========================================================================        
+
+class DeviceWrapper():
+    """Wrapper class for device object
+    
+    
+    Class provides framework to directly call device functions and attributes
+    while device is part of a worker thread in the background.
+    
+    
+    """
     
     def __init__(self, device):
         self.d = device
@@ -66,7 +67,7 @@ class WorkerDevice():
             self.wt.start()
             self.thread_runs = True
         else:
-            raise WorkerDeviceException('Thread runs already.')
+            raise DeviceWrapperException('Thread runs already.')
         
     def stop(self):
         """stops thread"""
@@ -74,7 +75,7 @@ class WorkerDevice():
             self.wt.stop()
             self.thread_runs = False
         else:
-            raise WorkerDeviceException('Thread is not running.')
+            raise DeviceWrapperException('Thread is not running.')
         
     def send_worker_task(self, *args, **kwargs):
         w = WorkerTask(
@@ -90,7 +91,7 @@ class WorkerDevice():
 
 
 # ===========================================================================
-# Test classes
+# Dummy classes
 # ===========================================================================        
 
 class C():
@@ -116,7 +117,7 @@ class C():
 if __name__ == "__main__":
     c = C()
     
-    wd = WorkerDevice(c)
+    wd = DeviceWrapper(c)
     
     pass
        

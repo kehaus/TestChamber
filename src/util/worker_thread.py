@@ -27,10 +27,23 @@ import inspect
 #from ..util.general_util import DataSet, TimeFormatter, CSVHandler, JSONHandler
 from general_util import DataSet, TimeFormatter, CSVHandler, JSONHandler
 
+
+
+# ===========================================================================
+# Exception class
+# ===========================================================================        
 class WorkerThreadException(Exception):
 	""" """
 	pass
 
+class WorkerTaskException(Exception):
+	""" """
+	pass
+
+
+# ===========================================================================
+# Worker Thread
+# ===========================================================================        
 
 class WorkerThread(threading.Thread):
 	"""
@@ -82,6 +95,9 @@ class WorkerThread(threading.Thread):
 		task.do_task()
 
 
+# ===========================================================================
+# Worker Task
+# ===========================================================================        
 
 class WorkerTaskBase(object):
 	""" """
@@ -114,11 +130,6 @@ class WorkerTaskBase(object):
 		rtn = self.obj_attr(*self.args, **self.kwargs)
 		return rtn
 
-
-
-class WorkerTaskException(Exception):
-	""" """
-	pass
 
 class WorkerTask(DataSet):
 	""" """
@@ -204,9 +215,11 @@ def func3(v=33, w=55, z=9):
 	print('v: ', v, 'w: ', w, 'z: ',z)
 	return
 
-wt = WorkerTask(func1, continuous=True)
-q = queue.Queue()
-w = WorkerThread(q)
+
+if __name__ == "__main__":
+    wt = WorkerTask(func1, continuous=True)
+    q = queue.Queue()
+    w = WorkerThread(q)
 
 
 
